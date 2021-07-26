@@ -144,13 +144,14 @@ class Resnet(nn.Module):
         return nn.Sequential(*layers)
 
 
-    def load_pretrained_model(self, state_dict):
+    def load_pretrained_model(self, pretrained_model):
+        state_dict = torch.load(pretrained_model)
         required_state_dict = self.state_dict()
         for key in state_dict.keys():
             if key in required_state_dict.keys() and key.find('fc') < 0:
                 required_state_dict[key] = state_dict[key]
         self.load_state_dict(required_state_dict)
-
+        print('Loading pre-trained model [%s] successfully.' % pretrained_model)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -194,5 +195,5 @@ def resnet(block_type='bottleneck', num_classes=1000, pretrained_model=None):
 
     net = Resnet(block, num_classes, [3, 4, 6, 3])
     if pretrained_model is not None:
-        net.load_pretrained_model(torch.load(pretrained_model))
+        net.load_pretrained_model(pretrained_model)
     return net
