@@ -92,13 +92,12 @@ class Bottleneck(nn.Module):
 
 
 class Resnet(nn.Module):
-    def __init__(self, block, num_classes, layers_num, zero_init_residual=False, norm_layer=None, classify=False):
+    def __init__(self, block, num_classes, layers_num, zero_init_residual=False, norm_layer=None):
         super(Resnet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
         self.in_channels = 64
-        self.classify = classify
 
         self.conv1 = nn.Conv2d(3, self.in_channels, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = norm_layer(self.in_channels)
@@ -110,7 +109,7 @@ class Resnet(nn.Module):
         self.layer3 = self._make_layer(256, layers_num[2], block, stride=2)
         self.layer4 = self._make_layer(512, layers_num[3], block, stride=2)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * Bottleneck.expansion, num_classes)
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
         self.sigmoid = nn.Sigmoid()
 
         for module in self.modules():
@@ -148,7 +147,7 @@ class Resnet(nn.Module):
     def load_pretrained_model(self, state_dict):
         required_state_dict = self.state_dict()
         for key in state_dict.keys():
-            if key in required_state_dict.keys():
+            if key in required_state_dict.keys() and key.find('fc') < 0:
                 required_state_dict[key] = state_dict[key]
         self.load_state_dict(required_state_dict)
 
@@ -185,7 +184,7 @@ class vgg16(nn.Module):
         return y
 
 
-def resnet(block_type='bottleneck', num_classes=1000, classify=False, pretrained_model=None):
+def resnet(block_type='bottleneck', num_classes=1000, pretrained_model=None):
     if block_type == 'basic':
         block = BasicBlock
     elif block_type == 'bottleneck':
@@ -193,7 +192,7 @@ def resnet(block_type='bottleneck', num_classes=1000, classify=False, pretrained
     else:
         raise NotImplementedError('Block [%s] is not found.' % block_type)
 
-    net = Resnet(block, num_classes, [3, 4, 6, 3], classify=classify)
+    net = Resnet(block, num_classes, [3, 4, 6, 3])
     if pretrained_model is not None:
         net.load_pretrained_model(torch.load(pretrained_model))
     return net

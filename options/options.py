@@ -5,7 +5,7 @@ def get_options():
     # overall options
     parser.add_argument('--name', required=True)
     parser.add_argument('--dataroot', required=True, help='Training dataset')
-    parser.add_argument('--model', default='resnet50', help='Type of training networks [resnet50 (default) | vgg16]')
+    parser.add_argument('--model', default='resnet50', help='Type of training networks [resnet50 (default) | resnet34 | vgg16]')
     parser.add_argument('--batch_size', type=int, default=32, help='Number of batch size')
     parser.add_argument('--num_classes', type=int, default=8000, help='Number of class')
     parser.add_argument('--load_size', type=int, default=512, help='Size of image')
@@ -13,7 +13,7 @@ def get_options():
     parser.add_argument('--load_epoch', type=str, default='latest', help='Epoch to load')
     parser.add_argument('--image_pattern', '-p', type=str, default='*.jpg', help='pattern of training images')
     parser.add_argument('--save_path', '-s', type=str, default='./checkpoints', help='Training record path')
-    parser.add_argument('--pre_trained_model', '-pre', type=str, default=None, help='Pre-trained model filename for classifier')
+    parser.add_argument('--pretrained_model', '-pre', type=str, default=None, help='Pre-trained model filename for classifier')
 
     #training options
     parser.add_argument('--learning_rate', '-lr', type=float, default=1e-3, help='Learning rate')
