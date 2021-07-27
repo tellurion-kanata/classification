@@ -29,12 +29,13 @@ class classifier(BaseModel):
         else:
             raise NotImplementedError('Such model is not implemented.')
 
+        target = self.model.fc.parameters()
         if not self.opt.eval:
             if self.opt.optimizer == 'sgd':
-                self.optimizer = optim.SGD(self.model.parameters(), lr=self.lr,
+                self.optimizer = optim.SGD(target, lr=self.lr,
                                            momentum=self.momentum)
             elif self.opt.optimizer == 'adam':
-                self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr,
+                self.optimizer = optim.Adam(target, lr=self.lr,
                                             betas=self.betas)
             else:
                 raise NotImplementedError('Such optimizer is not implemented.')
