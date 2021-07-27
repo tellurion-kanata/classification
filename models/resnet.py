@@ -112,7 +112,7 @@ class Resnet(nn.Module):
         self.reduce = reduce
         fc_channel = 512 * block.expansion
         if self.reduce:
-            self.reduce_conv = nn.Conv2d(2048, 512, kernel_size=1)
+            self.reduce_conv = nn.Conv2d(2048, 512, kernel_size=1, bias=False)
             self.reduce_bn = norm_layer(512)
             fc_channel = 512
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
