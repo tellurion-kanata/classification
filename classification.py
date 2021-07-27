@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import itertools
 
 import os
 import json
@@ -29,7 +30,10 @@ class classifier(BaseModel):
         else:
             raise NotImplementedError('Such model is not implemented.')
 
-        target = self.model.fc.parameters()
+
+        target = self.model.parameters()
+        # target = self.model.fc.parameters()
+        # target = itertools.chain(self.model.reduce_conv.parameters(), self.model.reduce_bn.parameters(), self.model.fc.parameters())
         if not self.opt.eval:
             if self.opt.optimizer == 'sgd':
                 self.optimizer = optim.SGD(target, lr=self.lr,

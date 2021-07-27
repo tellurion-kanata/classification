@@ -92,7 +92,7 @@ class Bottleneck(nn.Module):
 
 
 class Resnet(nn.Module):
-    def __init__(self, block, num_classes, layers_num, zero_init_residual=False, norm_layer=None):
+    def __init__(self, block, num_classes, layers_num, reduce=False, zero_init_residual=False, norm_layer=None):
         super(Resnet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -108,8 +108,15 @@ class Resnet(nn.Module):
         self.layer2 = self._make_layer(128, layers_num[1], block,  stride=2)
         self.layer3 = self._make_layer(256, layers_num[2], block, stride=2)
         self.layer4 = self._make_layer(512, layers_num[3], block, stride=2)
+
+        self.reduce = reduce
+        fc_channel = 512 * block.expansion
+        if self.reduce:
+            self.reduce_conv = nn.Conv2d(2048, 512, kernel_size=1)
+            self.reduce_bn = norm_layer(512)
+            fc_channel = 512
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(fc_channel, num_classes)
         self.sigmoid = nn.Sigmoid()
 
         for module in self.modules():
@@ -164,6 +171,10 @@ class Resnet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
+        if self.reduce:
+            x = self.reduce_conv(x)
+            x = self.reduce_bn(x)
+            x = self.relu(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
 
@@ -186,14 +197,16 @@ class vgg16(nn.Module):
 
 
 def resnet(block_type='bottleneck', num_classes=1000, pretrained_model=None):
+    reduce = False
     if block_type == 'basic':
         block = BasicBlock
     elif block_type == 'bottleneck':
         block = Bottleneck
+        reduce = True
     else:
         raise NotImplementedError('Block [%s] is not found.' % block_type)
 
-    net = Resnet(block, num_classes, [3, 4, 6, 3])
+    net = Resnet(block, num_classes, [3, 4, 6, 3], reduce)
     if pretrained_model is not None:
         net.load_pretrained_model(pretrained_model)
     return net
