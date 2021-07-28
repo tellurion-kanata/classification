@@ -70,13 +70,14 @@ class classifier(BaseModel):
                 self.forward()
                 self.backward()
                 self.optimizer.step()
-                self.step += 1
 
                 if self.step % self.opt.print_state_freq == 0:
                     self.set_state_dict()
                     self.print_training_iter(epoch, idx)
                 if self.step % self.opt.save_model_freq_step == 0:
                     self.save()
+
+                self.step += 1
 
             self.save()
             self.set_state_dict()

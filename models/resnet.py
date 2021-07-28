@@ -171,10 +171,6 @@ class Resnet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        if self.reduce:
-            x = self.reduce_conv(x)
-            x = self.reduce_bn(x)
-            x = self.relu(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
 
@@ -197,16 +193,14 @@ class vgg16(nn.Module):
 
 
 def resnet(block_type='bottleneck', num_classes=1000, pretrained_model=None):
-    reduce = False
     if block_type == 'basic':
         block = BasicBlock
     elif block_type == 'bottleneck':
         block = Bottleneck
-        reduce = True
     else:
         raise NotImplementedError('Block [%s] is not found.' % block_type)
 
-    net = Resnet(block, num_classes, [3, 4, 6, 3], reduce)
+    net = Resnet(block, num_classes, [3, 4, 6, 3])
     if pretrained_model is not None:
         net.load_pretrained_model(pretrained_model)
     return net
