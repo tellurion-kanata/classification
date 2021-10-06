@@ -20,13 +20,20 @@ class classifier(BaseModel):
         self.opt_model = 'classificiation'
         self.device = torch.device(self.opt.device)
         if self.opt.model == 'resnet50':
-            self.model = resnet(num_classes=self.num_classes,
+            self.model = resnet.resnet50(num_classes=self.num_classes,
                                 pretrained_model=self.opt.pretrained_model).to(self.device)
         elif self.opt.model == 'resnet34':
-            self.model = resnet(block_type='basic', num_classes=self.num_classes,
+            self.model = resnet.resnet34(num_classes=self.num_classes,
                                 pretrained_model=self.opt.pretrained_model).to(self.device)
-        elif self.opt.model == 'vgg16':
-            self.model = vgg16(num_classes=self.num_classes).to(self.device)
+        elif self.opt.model == 'resnet50x':
+            self.model = resnet.resnet50_32x4d(num_classes=self.num_classes,
+                                               pretrained_model=self.opt.pretrained_model).to(self.device)
+        elif self.opt.model == 'senet50':
+            self.model = senet.legacy_seresnet50(num_classes=self.num_classes,
+                                                 pretrained_model=self.opt.pretrained_model).to(self.device)
+        elif self.opt.model == 'senet50x':
+            self.model = senet.legacy_seresnext50_32x4d(num_classes=self.num_classes,
+                                                        pretrained_model=self.opt.pretrained_model).to(self.device)
         else:
             raise NotImplementedError('Such model is not implemented.')
 
