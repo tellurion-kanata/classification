@@ -25,13 +25,13 @@ class classifier(BaseModel):
         elif self.opt.model == 'resnet34':
             self.model = resnet.resnet34(num_classes=self.num_classes,
                                 pretrained_model=self.opt.pretrained_model).to(self.device)
-        elif self.opt.model == 'resnet50x':
+        elif self.opt.model == 'resnext50':
             self.model = resnet.resnet50_32x4d(num_classes=self.num_classes,
                                                pretrained_model=self.opt.pretrained_model).to(self.device)
         elif self.opt.model == 'senet50':
             self.model = senet.legacy_seresnet50(num_classes=self.num_classes,
                                                  pretrained_model=self.opt.pretrained_model).to(self.device)
-        elif self.opt.model == 'senet50x':
+        elif self.opt.model == 'senext50':
             self.model = senet.legacy_seresnext50_32x4d(num_classes=self.num_classes,
                                                         pretrained_model=self.opt.pretrained_model).to(self.device)
         else:
@@ -48,7 +48,7 @@ class classifier(BaseModel):
             else:
                 raise NotImplementedError('Such optimizer is not implemented.')
 
-            self.criterion = nn.BCELoss().to(self.device)
+            self.criterion = FocalLoss(alpha=0.25, gamma=2).to(self.device)
             self.optimizers = [self.optimizer]
         self.models = {'classification': self.model}
         self.setup()

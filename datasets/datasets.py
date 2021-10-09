@@ -53,8 +53,8 @@ class ImageDataset(data.Dataset):
         tags_file = image_file.replace(self.image_root, self.tags_root).replace('jpg', 'json')
         with open(tags_file, 'r') as f:
             img_dict = json.load(f)
-        class_vector = torch.zeros([self.num_classes])
-        class_vector[img_dict['tags']] = 1.
+        class_vector = torch.zeros([self.num_classes], dtype=torch.int64)
+        class_vector[img_dict['tags']] = 1
 
         return {'image': image,
                 'class': class_vector,
