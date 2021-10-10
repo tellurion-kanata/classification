@@ -35,16 +35,16 @@ def is_paired(img_file, ts=8, delete=False):
         print(tag_file)
         if delete:
             os.remove(img_file)
-            return True
+            return None, True
 
     with open(tag_file, 'r') as f:
         img_dict = json.load(f)
     if len(img_dict['tags']) < ts:
         if delete:
             os.remove(img_file)
-            return True
+            return None, True
 
-    return False
+    return img_file, False
 
 
 def is_truncated(file, delete=False):
@@ -74,9 +74,9 @@ def processing(thread_id, opt, img_files, delete=False):
         for i in range(data_size):
             if i % 5000 == 0:
                 print('id:{}, step: [{}/{}]'.format(thread_id, i, data_size))
-            is_delete = is_paired(img_files[i], ts, delete)
+            filename, is_delete = is_paired(img_files[i], ts, delete)
             if not is_delete:
-                is_truncated(img_files[i], delete)
+                is_truncated(filename, delete)
 
     elif opt.check_paired:
         for i in range(data_size):
