@@ -48,7 +48,10 @@ class classifier(BaseModel):
             else:
                 raise NotImplementedError('Such optimizer is not implemented.')
 
-            self.criterion = FocalLoss(alpha=0.25, gamma=2).to(self.device)
+            if self.opt.loss == 'focal':
+                self.criterion = FocalLoss(alpha=0.25, gamma=2)
+            else:
+                self.criterion = nn.BCELoss().to(self.device)
             self.optimizers = [self.optimizer]
         self.models = {'classification': self.model}
         self.setup()

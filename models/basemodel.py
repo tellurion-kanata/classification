@@ -56,62 +56,10 @@ class BaseModel():
         self.pre_epoch_time = self.start_time
         self.pre_iter_time = self.start_time
 
-        self.print_states()
 
     def eval(self):
         for net in self.models.keys():
             self.models[net].eval()
-
-    def write_states(self, filename):
-        file = open(os.path.join(self.ckpt_path, filename), 'a')
-        file.write('**************** model states *******************\n')
-        file.write('           model_name: %s\n' % self.opt.name)
-        file.write('           model_type: %s\n' % self.opt.model)
-        if not self.opt.eval:
-            file.write('       training_epoch: %d\n' % (self.ed_epoch - 1))
-            file.write('  start_learning_rate: %f\n' % self.lr)
-            file.write('            optimizer: %s\n' % self.opt.optimizer)
-        else:
-            file.write('                 eval: %s\n' % self.opt.eval)
-        file.write('              dataset: %s\n' % self.opt.dataroot)
-        file.write('            load_size: %s\n' % self.opt.load_size)
-        file.write('            no_resize: %s\n' % self.opt.no_resize)
-        file.write('              no_flip: %s\n' % self.opt.no_flip)
-        file.write('            no_rotate: %s\n' % self.opt.no_rotate)
-        file.write('            data_size: %d\n' % self.data_size)
-        file.write('           batch_size: %d\n' % self.batch_size)
-        file.write('          num_classes: %d\n' % self.num_classes)
-        file.write('      score_threshold: %f\n' % self.opt.score_thres)
-        file.write('*************************************************\n\n')
-        file.close()
-
-    def print_states(self):
-        print('**************** model states *******************')
-        print('           model_name: %s' % self.opt.name)
-        print('           model_type: %s' % self.opt.model)
-        if not self.opt.eval:
-            print('       training_epoch: %d' % (self.ed_epoch - 1))
-            print('  start_learning_rate: %f' % self.lr)
-            print('            optimizer: %s' % self.opt.optimizer)
-        else:
-            print('                 eval: %s' % self.opt.eval)
-        print('              dataset: %s' % self.opt.dataroot)
-        print('            load_size: %s' % self.opt.load_size)
-        print('            no_resize: %s' % self.opt.no_resize)
-        print('              no_flip: %s' % self.opt.no_flip)
-        print('            no_rotate: %s' % self.opt.no_rotate)
-        print('            data_size: %d' % self.data_size)
-        print('           batch_size: %d' % self.batch_size)
-        print('          num_classes: %d' % self.num_classes)
-        print('      score_threshold: %f' % self.opt.score_thres)
-        print('*************************************************')
-
-        self.opt_log = open(os.path.join(self.ckpt_path, 'model_opt.txt'), 'w')
-        self.write_states('model_opt.txt')
-
-        if not self.opt.eval:
-            self.train_log = open(os.path.join(self.ckpt_path, 'train_log.txt'), 'w')
-            self.write_states('train_log.txt')
 
     def save(self, epoch='latest'):
         if epoch != 'latest':

@@ -1,12 +1,12 @@
 import os
 
-from options import *
+from options import Options
 from classification import classifier
 
 
 
 if __name__ == '__main__':
-    opt = get_options()
+    opt = Options().get_options()
 
     if not os.path.exists(opt.save_path):
         os.mkdir(opt.save_path)

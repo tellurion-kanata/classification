@@ -14,6 +14,8 @@ def get_transforms(opt, grayscale=False):
     transform_list = []
     if not opt.no_resize:
         transform_list += [transforms.Resize((opt.load_size, opt.load_size))]
+    if not opt.no_crop:
+        transform_list += [transforms.RandomCrop((opt.crop_size, opt.crop_size))]
     if not opt.no_flip:
         transform_list += [transforms.RandomHorizontalFlip()]
     if not opt.no_rotate:

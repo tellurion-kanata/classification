@@ -297,7 +297,7 @@ class SENet(nn.Module):
         )
         self.feature_info += [dict(num_chs=512 * block.expansion, reduction=32, module='layer4')]
         self.num_features = 512 * block.expansion
-        self.avg_pool = nn.AvgPool2d(7, stride=1)
+        self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.last_linear = nn.Linear(512 * block.expansion, num_classes)
         self.sigmoid = nn.Sigmoid()
         for m in self.modules():
