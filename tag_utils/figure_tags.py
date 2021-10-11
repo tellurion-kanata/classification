@@ -26,6 +26,7 @@ def processing(img_root, tag_root, dst_root):
             try:
                 shutil.copy(tag_file, tag_file.replace(tag_path, dst_root))
             except:
+                os.remove(img_file)
                 continue
 
             if i % 5000 == 0:
