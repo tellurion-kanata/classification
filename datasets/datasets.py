@@ -44,7 +44,7 @@ class ImageDataset(data.Dataset):
         self.num_classes = self.opt.num_classes
         self.image_root = os.path.join(self.opt.dataroot, 'color')
         self.tags_root = os.path.join(self.opt.dataroot, 'tags')
-        self.image_files = glob(os.path.join(self.image_root, '*/*.jpg'))
+        self.image_files = glob(os.path.join(self.image_root, '*.jpg'))
         self.transforms = get_transforms(self.opt)
 
     def __getitem__(self, index):
@@ -52,7 +52,7 @@ class ImageDataset(data.Dataset):
         image = Image.open(image_file).convert('RGB')
         image = self.transforms(image)
 
-        tags_file = image_file.replace(self.image_root, self.tags_root).replace('jpg', 'json')
+        tags_file = image_file.replace(self.image_root, self.tags_root).replace('_crop.jpg', '.json')
         with open(tags_file, 'r') as f:
             img_dict = json.load(f)
         class_vector = torch.zeros([self.num_classes])
@@ -89,7 +89,7 @@ class TestDataset():
         ret_dict['path'] = image_file
 
         if self.incl_label:
-            tags_file = image_file.replace(self.image_root, self.tags_root).replace('jpg', 'json')
+            tags_file = image_file.replace(self.image_root, self.tags_root).replace('_crop.jpg', '.json')
             with open(tags_file, 'r') as f:
                 img_dict = json.load(f)
             class_vector = torch.zeros([self.num_classes])
