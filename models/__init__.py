@@ -1,7 +1,7 @@
 from .basemodel import *
 from .resnet import *
-from .loss_function import *
+from .focal_loss import *
 
 __all__ = [
-    'BaseModel', 'resnet', 'get_scheduler', 'senet', 'FocalLoss'
+    'BaseModel', 'resnet', 'get_scheduler', 'senet', 'BCEFocalLosswithLogits'
 ]

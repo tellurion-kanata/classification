@@ -299,7 +299,7 @@ class SENet(nn.Module):
         self.num_features = 512 * block.expansion
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.last_linear = nn.Linear(512 * block.expansion, num_classes)
-        self.sigmoid = nn.Sigmoid()
+
         for m in self.modules():
             _weight_init(m)
 
@@ -344,7 +344,6 @@ class SENet(nn.Module):
     def forward(self, x):
         x = self.forward_features(x)
         x = self.logits(x)
-        x = self.sigmoid(x)
         return x
 
     def load_pretrained_model(self, state_dict):

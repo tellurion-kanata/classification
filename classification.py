@@ -49,9 +49,9 @@ class classifier(BaseModel):
                 raise NotImplementedError('Such optimizer is not implemented.')
 
             if self.opt.loss == 'focal':
-                self.criterion = FocalLoss(alpha=0.25, gamma=2)
+                self.criterion = BCEFocalLosswithLogits(alpha=0.2, gamma=2)
             else:
-                self.criterion = nn.BCELoss().to(self.device)
+                self.criterion = nn.BCEWithLogitsLoss(reduction='sum').to(self.device)
             self.optimizers = [self.optimizer]
         self.models = {'classification': self.model}
         self.setup()
@@ -64,7 +64,7 @@ class classifier(BaseModel):
         self.predict_y = self.model(self.x)
 
     def backward(self):
-        self.loss = self.criterion(self.predict_y, self.y)
+        self.loss = self.criterion(self.predict_y, self.y) / self.batch_size
         self.loss.backward()
 
     def train(self):

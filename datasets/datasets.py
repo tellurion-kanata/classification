@@ -55,7 +55,7 @@ class ImageDataset(data.Dataset):
         tags_file = image_file.replace(self.image_root, self.tags_root).replace('jpg', 'json')
         with open(tags_file, 'r') as f:
             img_dict = json.load(f)
-        class_vector = torch.zeros([self.num_classes], dtype=torch.int64)
+        class_vector = torch.zeros([self.num_classes])
         class_vector[img_dict['tags']] = 1
 
         return {'image': image,
@@ -70,12 +70,14 @@ class TestDataset():
         self.opt = opt
         self.opt.no_flip = True
         self.num_classes = self.opt.num_classes
-        self.image_files = glob(os.path.join(self.opt.dataroot, '*.jpg'))
         self.incl_label = self.opt.gt_label
 
         if self.incl_label:
+            self.image_root = os.path.join(self.opt.dataroot, 'image')
             self.tags_root = os.path.join(self.opt.dataroot, 'tags')
-
+            self.image_files = glob(os.path.join(self.image_root, '*.jpg'))
+        else:
+            self.image_files = glob(os.path.join(self.opt.dataroot, '*.jpg'))
 
     def __getitem__(self, index):
         image_file = self.image_files[index]
