@@ -29,7 +29,7 @@ def is_paired(img_file, ts=8, delete=False):
         new_file = img_file.replace('png', 'jpg')
         os.rename(img_file, new_file)
         img_file = new_file
-    tag_file = img_file.replace('image', 'tags').replace('jpg', 'json')
+    tag_file = img_file.replace('color', 'tags').replace('jpg', 'json')
 
     if not os.path.exists(tag_file):
         print(tag_file)
@@ -102,7 +102,7 @@ def create_threads(opt):
     delete = opt.delete
     warnings.filterwarnings("error", category=UserWarning)
     
-    img_path = os.path.join(dataroot, 'image')
+    img_path = os.path.join(dataroot, 'color')
     tag_path = os.path.join(dataroot, 'tags')
     img_files = glob(os.path.join(img_path, '*/*'))
     tag_files = glob(os.path.join(tag_path, '*/*.json'))

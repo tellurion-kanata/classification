@@ -42,7 +42,7 @@ class ImageDataset(data.Dataset):
         if not os.path.exists(self.opt.dataroot):
             raise FileNotFoundError('data file is not found.')
         self.num_classes = self.opt.num_classes
-        self.image_root = os.path.join(self.opt.dataroot, 'image')
+        self.image_root = os.path.join(self.opt.dataroot, 'color')
         self.tags_root = os.path.join(self.opt.dataroot, 'tags')
         self.image_files = glob(os.path.join(self.image_root, '*/*.jpg'))
         self.transforms = get_transforms(self.opt)
