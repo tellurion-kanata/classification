@@ -5,6 +5,7 @@ import argparse
 import threading
 import warnings
 import PIL.Image as Image
+import numpy as np
 
 from glob import glob
 
@@ -18,7 +19,7 @@ def get_path():
     parser.add_argument('--check_truncated', action='store_true')
     parser.add_argument('--tags_threshold', '-ts', default=10, help='minimum number of tags')
     parser.add_argument('--resize', action='store_true')
-    parser.add_argument('--size', type=tuple, default=(512, 512))
+    parser.add_argument('--size', type=int, default=512)
     parser.add_argument('--num_threads', default=8, type=int, help='number of threads for processing data')
     return parser.parse_args()
 
@@ -29,39 +30,46 @@ def is_paired(img_file, ts=8, delete=False):
         new_file = img_file.replace('png', 'jpg')
         os.rename(img_file, new_file)
         img_file = new_file
-    tag_file = img_file.replace('color', 'tags').replace('_crop.jpg', '.json')
+    tag_file = img_file.replace('image', 'tags').replace('.jpg', '.json')
 
     if not os.path.exists(tag_file):
         print(tag_file)
         if delete:
             os.remove(img_file)
-            return None, True
+            return None
+        return img_file
 
     with open(tag_file, 'r') as f:
         img_dict = json.load(f)
     if len(img_dict['tags']) < ts:
+        print(tag_file)
         if delete:
             os.remove(img_file)
-            return None, True
-
-    return img_file, False
+            return None
+    return img_file
 
 
 def is_truncated(file, delete=False):
     try:
         Image.open(file)
+        cv2.imread(file)
     except:
         print(file)
         if delete:
             os.remove(file)
 
 
-def resize(file, size):
-    width, height = size[:]
+def resize(file, nsize):
     try:
         img = cv2.imread(file)
-        img = cv2.resize(img, (width, height))
-        cv2.imwrite(file, img)
+        height, width, c = img.shape
+        base = max(height, width)
+        padded = np.full((base, base, 3), 255, dtype=np.uint8)
+        padded[(base - height) // 2:(base + height) // 2, (base - width) // 2:(base + width) // 2, :] = img
+
+        if nsize is not None:
+            padded = cv2.resize(padded, (nsize, nsize))
+        cv2.imwrite(file, padded)
     except:
         raise IOError('Image is not opened correctly. path:{}'.format(file))
 
@@ -74,8 +82,8 @@ def processing(thread_id, opt, img_files, delete=False):
         for i in range(data_size):
             if i % 5000 == 0:
                 print('id:{}, step: [{}/{}]'.format(thread_id, i, data_size))
-            filename, is_delete = is_paired(img_files[i], ts, delete)
-            if not is_delete:
+            filename = is_paired(img_files[i], ts, delete)
+            if filename:
                 is_truncated(filename, delete)
 
     elif opt.check_paired:

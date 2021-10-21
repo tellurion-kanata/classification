@@ -42,9 +42,9 @@ class ImageDataset(data.Dataset):
         if not os.path.exists(self.opt.dataroot):
             raise FileNotFoundError('data file is not found.')
         self.num_classes = self.opt.num_classes
-        self.image_root = os.path.join(self.opt.dataroot, 'color')
+        self.image_root = os.path.join(self.opt.dataroot, 'image')
         self.tags_root = os.path.join(self.opt.dataroot, 'tags')
-        self.image_files = glob(os.path.join(self.image_root, '*.jpg'))
+        self.image_files = glob(os.path.join(self.image_root, '*/*.jpg'))
         self.transforms = get_transforms(self.opt)
 
     def __getitem__(self, index):
@@ -52,11 +52,12 @@ class ImageDataset(data.Dataset):
         image = Image.open(image_file).convert('RGB')
         image = self.transforms(image)
 
-        tags_file = image_file.replace(self.image_root, self.tags_root).replace('_crop.jpg', '.json')
+        tags_file = image_file.replace(self.image_root, self.tags_root).replace('.jpg', '.json')
         with open(tags_file, 'r') as f:
             img_dict = json.load(f)
-        class_vector = torch.zeros([self.num_classes])
+        class_vector = torch.zeros([8000])
         class_vector[img_dict['tags']] = 1
+        class_vector = class_vector[: self.num_classes]
 
         return {'image': image,
                 'class': class_vector,
@@ -89,7 +90,7 @@ class TestDataset():
         ret_dict['path'] = image_file
 
         if self.incl_label:
-            tags_file = image_file.replace(self.image_root, self.tags_root).replace('_crop.jpg', '.json')
+            tags_file = image_file.replace(self.image_root, self.tags_root).replace('.jpg', '.json')
             with open(tags_file, 'r') as f:
                 img_dict = json.load(f)
             class_vector = torch.zeros([self.num_classes])

@@ -11,7 +11,7 @@ class Options() :
         parser.add_argument('--dataroot', required=True, help='Training dataset')
         parser.add_argument('--model', default='resnet50', help='Type of training networks [resnet50 (default) | resnet34 | vgg16]')
         parser.add_argument('--batch_size', '-bs', type=int, default=32, help='Number of batch size')
-        parser.add_argument('--num_classes', type=int, default=8000, help='Number of class')
+        parser.add_argument('--num_classes', type=int, default=5000, help='Number of class')
         parser.add_argument('--load_size', type=int, default=320, help='Size of image')
         parser.add_argument('--crop_size', type=int, default=288, help='Crop size')
         parser.add_argument('--load_model', action='store_true', help='Load existed model')

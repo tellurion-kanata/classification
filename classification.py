@@ -51,7 +51,9 @@ class classifier(BaseModel):
             if self.opt.loss == 'focal':
                 self.criterion = BCEFocalLosswithLogits(alpha=0.2, gamma=2)
             else:
-                self.criterion = nn.BCEWithLogitsLoss(reduction='sum').to(self.device)
+                with open('tag_utils/tag_weights.json', 'r') as file:
+                    weights = torch.Tensor(json.load(file))[: self.num_classes].to(self.device)
+                self.criterion = nn.BCEWithLogitsLoss(weight=weights, reduction='sum').to(self.device)
             self.optimizers = [self.optimizer]
         self.models = {'classification': self.model}
         self.setup()
