@@ -49,11 +49,11 @@ class classifier(BaseModel):
                 raise NotImplementedError('Such optimizer is not implemented.')
 
             if self.opt.loss == 'focal':
-                self.criterion = BCEFocalLosswithLogits(alpha=0.2, gamma=2)
+                self.criterion = FocalLoss(alpha=0.2, gamma=2)
             else:
                 with open('tag_utils/tag_weights.json', 'r') as file:
                     weights = torch.Tensor(json.load(file))[: self.num_classes].to(self.device)
-                self.criterion = nn.BCEWithLogitsLoss(weight=weights, reduction='sum').to(self.device)
+                self.criterion = nn.BCELoss(weight=weights, reduction='sum').to(self.device)
             self.optimizers = [self.optimizer]
         self.models = {'classification': self.model}
         self.setup()
@@ -97,6 +97,9 @@ class classifier(BaseModel):
 
             if epoch % self.opt.save_model_freq == 0:
                 self.save(epoch)
+
+            for scheduler in self.schedulers:
+                scheduler.step()
 
 
     def calc_accuracy(self):
