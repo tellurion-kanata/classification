@@ -51,8 +51,10 @@ class classifier(BaseModel):
             if self.opt.loss == 'focal':
                 self.criterion = FocalLoss(alpha=0.2, gamma=2)
             else:
-                with open('tag_utils/tag_weights.json', 'r') as file:
-                    weights = torch.Tensor(json.load(file))[: self.num_classes].to(self.device)
+                weights = None
+                if self.opt.reweight:
+                    with open('tag_utils/tag_weights.json', 'r') as file:
+                        weights = torch.Tensor(json.load(file))[: self.num_classes].to(self.device)
                 self.criterion = nn.BCELoss(weight=weights, reduction='sum').to(self.device)
             self.optimizers = [self.optimizer]
         self.models = {'classification': self.model}
@@ -83,10 +85,10 @@ class classifier(BaseModel):
                 self.backward()
                 self.optimizer.step()
 
-                if self.step % self.opt.print_state_freq == 0:
+                if idx % self.opt.print_state_freq == 0:
                     self.set_state_dict()
                     self.print_training_iter(epoch, idx)
-                if self.step % self.opt.save_model_freq_step == 0:
+                if idx % self.opt.save_model_freq_step == 0:
                     self.save()
 
                 self.step += 1
@@ -117,7 +119,7 @@ class classifier(BaseModel):
         self.accuracy = tp / (tp + fp + fn + self.eps)
         self.precision = tp / (tp + fp + self.eps)
         self.recall = tp / (tp + fn + self.eps)
-        self.micro_F1 = (2. * self.precision * self.recall) / (self.recall + self.precision + self.eps)
+        self.micro_F2 = (5. * self.precision * self.recall) / (self.recall + 4 * self.precision + self.eps)
 
 
     def set_state_dict(self, eval=False):
@@ -126,10 +128,10 @@ class classifier(BaseModel):
 
         if not eval:
             self.state_dict = {'loss': self.loss, 'accuracy': self.accuracy,
-                               'precision': self.precision, 'recall': self.recall, 'micro-F1-score': self.micro_F1}
+                               'precision': self.precision, 'recall': self.recall, 'micro-F2-score': self.micro_F2}
         else:
             self.state_dict = {'accuracy': self.accuracy, 'precision': self.precision,
-                               'recall': self.recall, 'micro-F1-score': self.micro_F1}
+                               'recall': self.recall, 'micro-F2-score': self.micro_F2}
 
 
     # evaluation mode
